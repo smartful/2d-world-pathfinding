@@ -1,4 +1,4 @@
-import "./style.css";
+import { bfs } from "./algorithms/bfs.js";
 import {
   addRandomObstacles,
   createGrid,
@@ -8,6 +8,7 @@ import {
 } from "./grid.js";
 import { animateExploration, drawGrid } from "./render.js";
 import { fromKeyToPosition, fromPositionToKey } from "./utils.js";
+import "./style.css";
 
 // Canvas
 const width = 12;
@@ -36,53 +37,11 @@ setCell(grid, goalPosition, "G");
 
 drawGrid(grid, ctx, cellSize);
 
-/* BFS */
-const explorationQueue = [startKey];
-const visited = new Set([startKey]);
-const explorationOrder = [];
-const cameFrom = new Map(); // childKey -> parentKey
+const { found, explorationOrder, path } = bfs(grid, startKey, goalKey);
 
-let found = false;
-
-while (explorationQueue.length > 0) {
-  const currentKey = explorationQueue.shift();
-  explorationOrder.push(currentKey);
-
-  if (currentKey === goalKey) {
-    found = true;
-    break;
-  }
-
-  const currentPosition = fromKeyToPosition(currentKey);
-  const neighborPositions = getNeighborsPositions(grid, currentPosition);
-
-  for (let neighborPosition of neighborPositions) {
-    const neighborKey = fromPositionToKey(neighborPosition);
-    if (visited.has(neighborKey)) continue;
-    cameFrom.set(neighborKey, currentKey);
-    visited.add(neighborKey);
-    explorationQueue.push(neighborKey);
-  }
-}
-
-let path = [];
 if (!found) {
   console.log("No path found.");
 } else {
   console.log("Target found!");
-
-  // Reconstruct path: goal -> start
-  const reversePath = [];
-  let parent;
-  let current = goalKey;
-
-  while (parent !== startKey) {
-    reversePath.push(current);
-    parent = cameFrom.get(current);
-    if (!parent) break;
-    current = parent;
-  }
-
-  path = reversePath.reverse();
   animateExploration(grid, ctx, cellSize, explorationOrder, path);
 }
