@@ -2,12 +2,12 @@ import "./style.css";
 import {
   addRandomObstacles,
   createGrid,
-  fromKeyToPosition,
-  fromPositionToKey,
   getCell,
   getNeighborsPositions,
   setCell,
-} from "./utils.js";
+} from "./grid.js";
+import { animateExploration, drawGrid } from "./render.js";
+import { fromKeyToPosition, fromPositionToKey } from "./utils.js";
 
 // Canvas
 const width = 12;
@@ -34,70 +34,7 @@ addRandomObstacles(grid, 0.25, forbidden);
 setCell(grid, startPosition, "S");
 setCell(grid, goalPosition, "G");
 
-// Some graphical utils
-const drawGrid = (grid) => {
-  for (let y = 0; y < grid.length; y++) {
-    for (let x = 0; x < grid[0].length; x++) {
-      const cell = getCell(grid, { x, y });
-
-      if (cell === "#") ctx.fillStyle = "#444";
-      else if (cell === "S") ctx.fillStyle = "#3b82f6";
-      else if (cell === "G") ctx.fillStyle = "#22c55e";
-      else if (cell === "V") ctx.fillStyle = "#a855f7";
-      else if (cell === "*") ctx.fillStyle = "#facc15";
-      else ctx.fillStyle = "#e5e7eb";
-
-      ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-
-      ctx.strokeStyle = "#222";
-      ctx.strokeRect(x * cellSize, y * cellSize, cellSize, cellSize);
-    }
-  }
-};
-
-const animateExploration = (grid, explorationOrder, path, index = 0) => {
-  if (index >= explorationOrder.length) {
-    animatePath(grid, path);
-    return;
-  }
-
-  const key = explorationOrder[index];
-  const position = fromKeyToPosition(key);
-  const cell = getCell(grid, position);
-
-  if (cell === ".") {
-    setCell(grid, position, "V");
-  }
-
-  drawGrid(grid);
-
-  setTimeout(() => {
-    animateExploration(grid, explorationOrder, path, index + 1);
-  }, 150);
-};
-
-const animatePath = (grid, path, index = 0) => {
-  if (index >= path.length) {
-    drawGrid(grid);
-    return;
-  }
-
-  const key = path[index];
-  const position = fromKeyToPosition(key);
-  const cell = getCell(grid, position);
-
-  if (cell === "." || cell === "V") {
-    setCell(grid, position, "*");
-  }
-
-  drawGrid(grid);
-
-  setTimeout(() => {
-    animatePath(grid, path, index + 1);
-  }, 120);
-};
-
-drawGrid(grid);
+drawGrid(grid, ctx, cellSize);
 
 /* BFS */
 const explorationQueue = [startKey];
@@ -147,5 +84,5 @@ if (!found) {
   }
 
   path = reversePath.reverse();
-  animateExploration(grid, explorationOrder, path);
+  animateExploration(grid, ctx, cellSize, explorationOrder, path);
 }
