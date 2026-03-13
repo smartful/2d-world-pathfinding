@@ -8,13 +8,17 @@ import {
 export const dijkstra = (grid, startKey, goalKey) => {
   const explorationQueue = [{ key: startKey, priority: 0 }];
   const gScore = new Map([[startKey, 0]]);
-  const visited = new Set([startKey]);
+  const visited = new Set();
   const explorationOrder = [];
   const cameFrom = new Map(); // childKey -> parentKey
 
   let found = false;
   while (explorationQueue.length > 0) {
     const current = popLowestPriority(explorationQueue);
+    if (!current) break;
+    if (visited.has(current.key)) continue;
+
+    visited.add(current.key);
     explorationOrder.push(current.key);
 
     if (current.key === goalKey) {
@@ -27,29 +31,34 @@ export const dijkstra = (grid, startKey, goalKey) => {
     for (let neighborPosition of neighborsPositions) {
       const neighborKey = fromPositionToKey(neighborPosition);
       if (visited.has(neighborKey)) continue;
+
       const cost = getMovementCost(grid, neighborPosition);
-      cameFrom.set(neighborKey, current.key);
-      visited.add(neighborKey);
-      gScore.set(neighborKey, cost);
-      explorationQueue.push({
-        key: neighborKey,
-        priority: gScore.get(neighborKey),
-      });
+      const tryG = gScore.get(current.key) + cost;
+      const neighborG = gScore.get(neighborKey);
+      if (neighborG === undefined || tryG < neighborG) {
+        gScore.set(neighborKey, tryG);
+        cameFrom.set(neighborKey, current.key);
+
+        explorationQueue.push({
+          key: neighborKey,
+          priority: tryG,
+        });
+      }
     }
   }
 
   // Reconstruct path: goal -> start
-  const reversePath = [];
-  let parent;
-  let current = goalKey;
+  const path = [];
+  if (found) {
+    let currentKey = goalKey;
 
-  while (parent !== startKey) {
-    reversePath.push(current);
-    parent = cameFrom.get(current);
-    if (!parent) break;
-    current = parent;
+    while (currentKey !== startKey) {
+      path.push(currentKey);
+      currentKey = cameFrom.get(currentKey);
+      if (!currentKey) break;
+    }
+    path.reverse();
   }
-  const path = reversePath.reverse();
 
   return {
     found,
