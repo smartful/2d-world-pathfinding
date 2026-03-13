@@ -1,21 +1,41 @@
 import { getCell, setCell } from "./grid";
-import { fromKeyToPosition } from "./utils";
+import { fromKeyToPosition, fromPositionToKey } from "./utils";
 
-export const drawGrid = (grid, context, cellSize) => {
+export const drawGrid = (
+  grid,
+  context,
+  cellSize,
+  visitedCells = new Set(),
+  pathCells = new Set(),
+) => {
   for (let y = 0; y < grid.length; y++) {
     for (let x = 0; x < grid[0].length; x++) {
-      const cell = getCell(grid, { x, y });
+      const position = { x, y };
+      const key = fromPositionToKey(position);
+      const cell = getCell(grid, position);
 
+      // 1) Base terrain
       if (cell === "#") context.fillStyle = "#444";
       else if (cell === "S") context.fillStyle = "#3b82f6";
       else if (cell === "G") context.fillStyle = "#22c55e";
-      else if (cell === "V") context.fillStyle = "#a955f773";
-      else if (cell === "~") context.fillStyle = "#b6956a";
-      else if (cell === "*") context.fillStyle = "#facc1573";
+      else if (cell === "~") context.fillStyle = "#8f7450";
       else context.fillStyle = "#e5e7eb";
 
       context.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
 
+      // 2) Overlay visited
+      if (visitedCells.has(key)) {
+        context.fillStyle = "rgba(169, 85, 247, 0.45)";
+        context.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+      }
+
+      // 3) Overlay path
+      if (pathCells.has(key)) {
+        context.fillStyle = "rgba(250, 204, 21, 0.55)";
+        context.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+      }
+
+      // 4) Grid border
       context.strokeStyle = "#222";
       context.strokeRect(x * cellSize, y * cellSize, cellSize, cellSize);
     }
@@ -28,10 +48,12 @@ export const animateExploration = (
   cellSize,
   explorationOrder,
   path,
+  visitedCells = new Set(),
+  pathCells = new Set(),
   index = 0,
 ) => {
   if (index >= explorationOrder.length) {
-    animatePath(grid, context, cellSize, path);
+    animatePath(grid, context, cellSize, path, visitedCells, pathCells, 0);
     return;
   }
 
@@ -40,10 +62,10 @@ export const animateExploration = (
   const cell = getCell(grid, position);
 
   if (cell === "." || cell === "~") {
-    setCell(grid, position, "V");
+    visitedCells.add(key);
   }
 
-  drawGrid(grid, context, cellSize);
+  drawGrid(grid, context, cellSize, visitedCells, pathCells);
 
   setTimeout(() => {
     animateExploration(
@@ -52,14 +74,24 @@ export const animateExploration = (
       cellSize,
       explorationOrder,
       path,
+      visitedCells,
+      pathCells,
       index + 1,
     );
   }, 150);
 };
 
-export const animatePath = (grid, context, cellSize, path, index = 0) => {
+export const animatePath = (
+  grid,
+  context,
+  cellSize,
+  path,
+  visitedCells = new Set(),
+  pathCells = new Set(),
+  index = 0,
+) => {
   if (index >= path.length) {
-    drawGrid(grid, context, cellSize);
+    drawGrid(grid, context, cellSize, visitedCells, pathCells);
     return;
   }
 
@@ -67,13 +99,21 @@ export const animatePath = (grid, context, cellSize, path, index = 0) => {
   const position = fromKeyToPosition(key);
   const cell = getCell(grid, position);
 
-  if (cell === "." || cell === "~" || cell === "V") {
-    setCell(grid, position, "*");
+  if (cell !== "#") {
+    pathCells.add(key);
   }
 
-  drawGrid(grid, context, cellSize);
+  drawGrid(grid, context, cellSize, visitedCells, pathCells);
 
   setTimeout(() => {
-    animatePath(grid, context, cellSize, path, index + 1);
+    animatePath(
+      grid,
+      context,
+      cellSize,
+      path,
+      visitedCells,
+      pathCells,
+      index + 1,
+    );
   }, 120);
 };
