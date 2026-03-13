@@ -1,13 +1,13 @@
-import { bfs } from "./algorithms/bfs.js";
+// import { bfs } from "./algorithms/bfs.js";
+import { dijkstra } from "./algorithms/dijkstra.js";
 import {
   addRandomObstacles,
+  addRandomWeightedCells,
   createGrid,
-  getCell,
-  getNeighborsPositions,
   setCell,
 } from "./grid.js";
 import { animateExploration, drawGrid } from "./render.js";
-import { fromKeyToPosition, fromPositionToKey } from "./utils.js";
+import { fromPositionToKey } from "./utils.js";
 import "./style.css";
 
 // Canvas
@@ -31,13 +31,14 @@ const startKey = fromPositionToKey(startPosition);
 const goalKey = fromPositionToKey(goalPosition);
 
 const forbidden = new Set([startKey, goalKey]);
-addRandomObstacles(grid, 0.25, forbidden);
+addRandomObstacles(grid, 0.15, forbidden);
+addRandomWeightedCells(grid, 0.2, forbidden);
 setCell(grid, startPosition, "S");
 setCell(grid, goalPosition, "G");
 
 drawGrid(grid, ctx, cellSize);
 
-const { found, explorationOrder, path } = bfs(grid, startKey, goalKey);
+const { found, explorationOrder, path } = dijkstra(grid, startKey, goalKey);
 
 if (!found) {
   console.log("No path found.");

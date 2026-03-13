@@ -9,8 +9,9 @@ export const drawGrid = (grid, context, cellSize) => {
       if (cell === "#") context.fillStyle = "#444";
       else if (cell === "S") context.fillStyle = "#3b82f6";
       else if (cell === "G") context.fillStyle = "#22c55e";
-      else if (cell === "V") context.fillStyle = "#a855f7";
-      else if (cell === "*") context.fillStyle = "#facc15";
+      else if (cell === "V") context.fillStyle = "#a955f773";
+      else if (cell === "~") context.fillStyle = "#b6956a";
+      else if (cell === "*") context.fillStyle = "#facc1573";
       else context.fillStyle = "#e5e7eb";
 
       context.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
@@ -38,7 +39,7 @@ export const animateExploration = (
   const position = fromKeyToPosition(key);
   const cell = getCell(grid, position);
 
-  if (cell === ".") {
+  if (cell === "." || cell === "~") {
     setCell(grid, position, "V");
   }
 
@@ -66,7 +67,7 @@ export const animatePath = (grid, context, cellSize, path, index = 0) => {
   const position = fromKeyToPosition(key);
   const cell = getCell(grid, position);
 
-  if (cell === "." || cell === "V") {
+  if (cell === "." || cell === "~" || cell === "V") {
     setCell(grid, position, "*");
   }
 

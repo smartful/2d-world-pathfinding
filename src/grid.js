@@ -54,6 +54,29 @@ export const addRandomObstacles = (
   }
 };
 
+export const addRandomWeightedCells = (
+  grid,
+  ratio = 0.2,
+  forbidden = new Set(),
+) => {
+  const height = grid.length;
+  const width = grid[0].length;
+  const total = height * width;
+  const obstaclesCount = Math.floor(total * ratio);
+
+  let placed = 0;
+  while (placed < obstaclesCount) {
+    const x = Math.floor(Math.random() * width);
+    const y = Math.floor(Math.random() * height);
+    const key = `${x},${y}`;
+    if (forbidden.has(key)) continue;
+    if (grid[y][x] === ".") {
+      grid[y][x] = "~";
+      placed++;
+    }
+  }
+};
+
 export const isCorrectMovement = (grid, newPosition, obstacle = "#") => {
   return inBounds(grid, newPosition) && getCell(grid, newPosition) !== obstacle;
 };
@@ -70,4 +93,13 @@ export const getNeighborsPositions = (grid, position) => {
   if (isCorrectMovement(grid, leftPosition)) neighbors.push(leftPosition);
 
   return neighbors;
+};
+
+export const getMovementCost = (grid, position) => {
+  const cell = getCell(grid, position);
+
+  if (cell === "~") return 5;
+  if (cell === "#") return Infinity;
+
+  return 1;
 };
