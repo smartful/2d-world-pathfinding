@@ -77,6 +77,13 @@ export const addRandomWeightedCells = (
   }
 };
 
+export const isDiagonalMove = (currentPosition, neighborPosition) => {
+  return (
+    neighborPosition.x !== currentPosition.x &&
+    neighborPosition.y !== currentPosition.y
+  );
+};
+
 export const isCorrectMovement = (grid, newPosition, obstacle = "#") => {
   return inBounds(grid, newPosition) && getCell(grid, newPosition) !== obstacle;
 };
@@ -84,15 +91,40 @@ export const isCorrectMovement = (grid, newPosition, obstacle = "#") => {
 export const getNeighborsPositions = (grid, position) => {
   const neighbors = [];
   const topPosition = { x: position.x, y: position.y - 1 };
+  const topRightPosition = { x: position.x + 1, y: position.y - 1 };
   const rightPosition = { x: position.x + 1, y: position.y };
+  const bottomRightPosition = { x: position.x + 1, y: position.y + 1 };
   const bottomPosition = { x: position.x, y: position.y + 1 };
+  const bottomLeftPosition = { x: position.x - 1, y: position.y + 1 };
   const leftPosition = { x: position.x - 1, y: position.y };
-  if (isCorrectMovement(grid, topPosition)) neighbors.push(topPosition);
-  if (isCorrectMovement(grid, rightPosition)) neighbors.push(rightPosition);
-  if (isCorrectMovement(grid, bottomPosition)) neighbors.push(bottomPosition);
-  if (isCorrectMovement(grid, leftPosition)) neighbors.push(leftPosition);
+  const topLeftPosition = { x: position.x - 1, y: position.y - 1 };
 
-  return neighbors;
+  if (isCorrectMovement(grid, topPosition)) neighbors.push(topPosition);
+  if (isCorrectMovement(grid, topRightPosition))
+    neighbors.push(topRightPosition);
+  if (isCorrectMovement(grid, rightPosition)) neighbors.push(rightPosition);
+  if (isCorrectMovement(grid, bottomRightPosition))
+    neighbors.push(bottomRightPosition);
+  if (isCorrectMovement(grid, bottomPosition)) neighbors.push(bottomPosition);
+  if (isCorrectMovement(grid, bottomLeftPosition))
+    neighbors.push(bottomLeftPosition);
+  if (isCorrectMovement(grid, leftPosition)) neighbors.push(leftPosition);
+  if (isCorrectMovement(grid, topLeftPosition)) neighbors.push(topLeftPosition);
+
+  return neighbors.filter((neighbor) => {
+    const dx = neighbor.x - position.x;
+    const dy = neighbor.y - position.y;
+
+    if (dx === 0 || dy === 0) {
+      // Le mouvement n'est pas en diagonale
+      return true;
+    }
+
+    // Check des côtés
+    const sideA = { x: position.x + dx, y: position.y };
+    const sideB = { x: position.x, y: position.y + dy };
+    return isCorrectMovement(grid, sideA) && isCorrectMovement(grid, sideB);
+  });
 };
 
 export const getMovementCost = (grid, position) => {

@@ -1,4 +1,8 @@
-import { getNeighborsPositions, getMovementCost } from "../grid";
+import {
+  getNeighborsPositions,
+  getMovementCost,
+  isDiagonalMove,
+} from "../grid";
 import {
   fromKeyToPosition,
   fromPositionToKey,
@@ -32,7 +36,9 @@ export const dijkstra = (grid, startKey, goalKey) => {
       const neighborKey = fromPositionToKey(neighborPosition);
       if (visited.has(neighborKey)) continue;
 
-      const cost = getMovementCost(grid, neighborPosition);
+      const isDiagonal = isDiagonalMove(currentPosition, neighborPosition);
+      const directionMutiplier = isDiagonal ? Math.sqrt(2) : 1;
+      const cost = getMovementCost(grid, neighborPosition) * directionMutiplier;
       const tryG = gScore.get(current.key) + cost;
       const neighborG = gScore.get(neighborKey);
       if (neighborG === undefined || tryG < neighborG) {

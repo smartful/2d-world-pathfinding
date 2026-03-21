@@ -1,8 +1,12 @@
-import { getNeighborsPositions, getMovementCost } from "../grid";
+import {
+  getNeighborsPositions,
+  getMovementCost,
+  isDiagonalMove,
+} from "../grid";
+import { octileDistance } from "../heuristics";
 import {
   fromKeyToPosition,
   fromPositionToKey,
-  manhattan,
   popLowestPriority,
 } from "../utils";
 
@@ -11,7 +15,7 @@ export const a_star = (grid, startKey, goalKey) => {
   const goalPosition = fromKeyToPosition(goalKey);
 
   const explorationQueue = [
-    { key: startKey, priority: manhattan(startPosition, goalPosition) },
+    { key: startKey, priority: octileDistance(startPosition, goalPosition) },
   ];
   const gScore = new Map([[startKey, 0]]);
   const visited = new Set();
@@ -41,12 +45,15 @@ export const a_star = (grid, startKey, goalKey) => {
       const neighborKey = fromPositionToKey(neighborPosition);
       if (visited.has(neighborKey)) continue;
 
-      const tryNeighborG = currentG + getMovementCost(grid, neighborPosition);
+      const isDiagonal = isDiagonalMove(currentPosition, neighborPosition);
+      const directionMutiplier = isDiagonal ? Math.sqrt(2) : 1;
+      const tryNeighborG =
+        currentG + getMovementCost(grid, neighborPosition) * directionMutiplier;
       const existingNeighborG = gScore.get(neighborKey);
       if (existingNeighborG === undefined || tryNeighborG < existingNeighborG) {
         gScore.set(neighborKey, tryNeighborG);
         const neighborF =
-          tryNeighborG + manhattan(neighborPosition, goalPosition);
+          tryNeighborG + octileDistance(neighborPosition, goalPosition);
 
         cameFrom.set(neighborKey, current.key);
         explorationQueue.push({
