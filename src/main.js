@@ -94,12 +94,12 @@ if (!result.found) {
   console.log("No path found.");
 } else {
   console.log("Target found!");
-  const pathCost = getPathCost(grid, result.path);
+  const pathCost = getPathCost(grid, result.path, startKey);
   const pathLength = getPathLength(result.path);
   const exploredNodesCount = getExploredNodesCount(result.explorationOrder);
 
   document.getElementById("pathLength").innerText = pathLength;
-  document.getElementById("pathCost").innerText = pathCost;
+  document.getElementById("pathCost").innerText = pathCost.toFixed(2);
   document.getElementById("exploredNodes").innerText = exploredNodesCount;
 
   animateExploration(grid, ctx, cellSize, result.explorationOrder, result.path);
