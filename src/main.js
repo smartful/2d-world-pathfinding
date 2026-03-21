@@ -7,6 +7,11 @@ import {
   createGrid,
   setCell,
 } from "./grid.js";
+import {
+  getExploredNodesCount,
+  getPathCost,
+  getPathLength,
+} from "./metrics.js";
 import { animateExploration, drawGrid } from "./render.js";
 import { fromPositionToKey } from "./utils.js";
 import "./style.css";
@@ -89,6 +94,14 @@ if (!result.found) {
   console.log("No path found.");
 } else {
   console.log("Target found!");
+  const pathCost = getPathCost(grid, result.path);
+  const pathLength = getPathLength(result.path);
+  const exploredNodesCount = getExploredNodesCount(result.explorationOrder);
+
+  document.getElementById("pathLength").innerText = pathLength;
+  document.getElementById("pathCost").innerText = pathCost;
+  document.getElementById("exploredNodes").innerText = exploredNodesCount;
+
   animateExploration(grid, ctx, cellSize, result.explorationOrder, result.path);
 }
 

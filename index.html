@@ -14,6 +14,13 @@
       <option value="dijkstra">Dijkstra</option>
       <option value="a_star">A*</option>
     </select>
+
+    <div id="stats">
+      <p>Longueur du chemin : <span id="pathLength"></span></p>
+      <p>Coût du chemin : <span id="pathCost"></span></p>
+      <p>Nœuds explorés : <span id="exploredNodes"></span></p>
+    </div>
+
     <canvas id="gridCanvas"></canvas>
 
     <button id="regenBtn">Régénérer la grille</button>
