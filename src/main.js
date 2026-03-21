@@ -23,25 +23,51 @@ canvas.width = width * cellSize;
 canvas.height = height * cellSize;
 
 // Init
-const grid = createGrid(width, height);
-
 const startPosition = { x: 1, y: 1 };
 const goalPosition = { x: 10, y: 6 };
 
 const startKey = fromPositionToKey(startPosition);
 const goalKey = fromPositionToKey(goalPosition);
 
-const forbidden = new Set([startKey, goalKey]);
-addRandomObstacles(grid, 0.15, forbidden);
-addRandomWeightedCells(grid, 0.2, forbidden);
-setCell(grid, startPosition, "S");
-setCell(grid, goalPosition, "G");
+const STORAGE_KEY = "2d-world-grid";
+
+let grid;
+const savedGrid = localStorage.getItem(STORAGE_KEY);
+if (savedGrid) {
+  grid = JSON.parse(savedGrid);
+} else {
+  grid = createGrid(width, height);
+  const forbidden = new Set([startKey, goalKey]);
+  addRandomObstacles(grid, 0.15, forbidden);
+  addRandomWeightedCells(grid, 0.2, forbidden);
+  setCell(grid, startPosition, "S");
+  setCell(grid, goalPosition, "G");
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(grid));
+}
 
 drawGrid(grid, ctx, cellSize);
 
-const algorithm = "a_star";
+const params = new URLSearchParams(window.location.search);
+const algorithm = params.get("algo") || "bfs";
 const algoTitle = document.getElementById("algoTitle");
-algoTitle.innerText = algorithm;
+algoTitle.innerText = {
+  bfs: "Breadth First Search",
+  dijkstra: "Dijkstra",
+  a_star: "A*",
+}[algorithm];
+
+const algoSelect = document.getElementById("algoSelect");
+algoSelect.value = algorithm;
+
+algoSelect.addEventListener("change", (e) => {
+  const selectedAlgo = e.target.value;
+
+  const params = new URLSearchParams(window.location.search);
+  params.set("algo", selectedAlgo);
+
+  window.location.search = params.toString();
+});
 
 let result;
 switch (algorithm) {
@@ -65,3 +91,10 @@ if (!result.found) {
   console.log("Target found!");
   animateExploration(grid, ctx, cellSize, result.explorationOrder, result.path);
 }
+
+const regenBtn = document.getElementById("regenBtn");
+
+regenBtn.addEventListener("click", () => {
+  localStorage.removeItem(STORAGE_KEY);
+  window.location.reload();
+});

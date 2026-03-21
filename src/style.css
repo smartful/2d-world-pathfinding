@@ -13,3 +13,17 @@ canvas {
   border: 1px solid #444;
   background: #222;
 }
+
+#algoSelect {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+#regenBtn {
+  width: 20%;
+  height: 2rem;
+  box-shadow: #444 3px 3px 2px;
+  border-radius: 15px;
+  margin-top: 2rem;
+  font-size: medium;
+}

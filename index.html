@@ -9,7 +9,15 @@
   <body>
     <h1>Simulateur de grille</h1>
     <h2>Algorithme : <span id="algoTitle"></span></h2>
+    <select id="algoSelect">
+      <option value="bfs">BFS</option>
+      <option value="dijkstra">Dijkstra</option>
+      <option value="a_star">A*</option>
+    </select>
     <canvas id="gridCanvas"></canvas>
+
+    <button id="regenBtn">Régénérer la grille</button>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
