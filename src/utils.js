@@ -22,3 +22,9 @@ export const popLowestPriority = (queue) => {
 
   return best;
 };
+
+export const manhattan = (positionA, positionB) => {
+  return (
+    Math.abs(positionB.x - positionA.x) + Math.abs(positionB.y - positionA.y)
+  );
+};

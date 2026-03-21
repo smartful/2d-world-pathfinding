@@ -1,5 +1,6 @@
 // import { bfs } from "./algorithms/bfs.js";
-import { dijkstra } from "./algorithms/dijkstra.js";
+// import { dijkstra } from "./algorithms/dijkstra.js";
+import { a_star } from "./algorithms/a_star.js";
 import {
   addRandomObstacles,
   addRandomWeightedCells,
@@ -38,7 +39,7 @@ setCell(grid, goalPosition, "G");
 
 drawGrid(grid, ctx, cellSize);
 
-const { found, explorationOrder, path } = dijkstra(grid, startKey, goalKey);
+const { found, explorationOrder, path } = a_star(grid, startKey, goalKey);
 
 if (!found) {
   console.log("No path found.");
