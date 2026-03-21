@@ -10,9 +10,10 @@ export const a_star = (grid, startKey, goalKey) => {
   const startPosition = fromKeyToPosition(startKey);
   const goalPosition = fromKeyToPosition(goalKey);
 
-  const explorationQueue = [{ key: startKey, priority: 0 }];
+  const explorationQueue = [
+    { key: startKey, priority: manhattan(startPosition, goalPosition) },
+  ];
   const gScore = new Map([[startKey, 0]]);
-  const fScore = new Map([[startKey, manhattan(startPosition, goalPosition)]]);
   const visited = new Set();
   const explorationOrder = [];
   const cameFrom = new Map(); // childKey -> parentKey
@@ -44,10 +45,8 @@ export const a_star = (grid, startKey, goalKey) => {
       const existingNeighborG = gScore.get(neighborKey);
       if (existingNeighborG === undefined || tryNeighborG < existingNeighborG) {
         gScore.set(neighborKey, tryNeighborG);
-
         const neighborF =
           tryNeighborG + manhattan(neighborPosition, goalPosition);
-        fScore.set(neighborKey, neighborF);
 
         cameFrom.set(neighborKey, current.key);
         explorationQueue.push({
