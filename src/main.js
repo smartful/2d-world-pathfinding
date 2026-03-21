@@ -1,5 +1,5 @@
-// import { bfs } from "./algorithms/bfs.js";
-// import { dijkstra } from "./algorithms/dijkstra.js";
+import { bfs } from "./algorithms/bfs.js";
+import { dijkstra } from "./algorithms/dijkstra.js";
 import { a_star } from "./algorithms/a_star.js";
 import {
   addRandomObstacles,
@@ -39,11 +39,29 @@ setCell(grid, goalPosition, "G");
 
 drawGrid(grid, ctx, cellSize);
 
-const { found, explorationOrder, path } = a_star(grid, startKey, goalKey);
+const algorithm = "a_star";
+const algoTitle = document.getElementById("algoTitle");
+algoTitle.innerText = algorithm;
 
-if (!found) {
+let result;
+switch (algorithm) {
+  case "bfs":
+    result = bfs(grid, startKey, goalKey);
+    break;
+  case "dijkstra":
+    result = dijkstra(grid, startKey, goalKey);
+    break;
+  case "a_star":
+    result = a_star(grid, startKey, goalKey);
+    break;
+  default:
+    result = bfs(grid, startKey, goalKey);
+    break;
+}
+
+if (!result.found) {
   console.log("No path found.");
 } else {
   console.log("Target found!");
-  animateExploration(grid, ctx, cellSize, explorationOrder, path);
+  animateExploration(grid, ctx, cellSize, result.explorationOrder, result.path);
 }
