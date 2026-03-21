@@ -4,6 +4,13 @@ export const createGrid = (width, height, fill = ".") => {
   return Array.from({ length: height }, () => Array(width).fill(fill));
 };
 
+export const createAgentGrid = (grid, startPosition, goalPosition) => {
+  const unknownGrid = grid.map((row) => row.map(() => "?"));
+  setCell(unknownGrid, startPosition, "S");
+  setCell(unknownGrid, goalPosition, "G");
+  return unknownGrid;
+};
+
 export const printGrid = (grid) => {
   console.log(grid.map((row) => row.join(" ")).join("\n"));
 };

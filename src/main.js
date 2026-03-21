@@ -4,7 +4,9 @@ import { a_star } from "./algorithms/a_star.js";
 import {
   addRandomObstacles,
   addRandomWeightedCells,
+  createAgentGrid,
   createGrid,
+  printGrid,
   setCell,
 } from "./grid.js";
 import {
@@ -50,6 +52,10 @@ if (savedGrid) {
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(grid));
 }
+
+const agentGrid = createAgentGrid(grid, startPosition, goalPosition);
+printGrid(grid);
+printGrid(agentGrid);
 
 drawGrid(grid, ctx, cellSize);
 
