@@ -26,6 +26,7 @@ export const a_star = (grid, startKey, goalKey) => {
 
   while (explorationQueue.length > 0) {
     const current = popLowestPriority(explorationQueue);
+    const currentPosition = fromKeyToPosition(current.key);
     if (!current) break;
     if (visited.has(current.key)) continue;
 
@@ -37,7 +38,6 @@ export const a_star = (grid, startKey, goalKey) => {
       break;
     }
 
-    const currentPosition = fromKeyToPosition(current.key);
     const currentG = gScore.get(current.key);
 
     const neighborsPositions = getNeighborsPositions(grid, currentPosition);

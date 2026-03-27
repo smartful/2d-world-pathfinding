@@ -11,6 +11,26 @@ export const createAgentGrid = (grid, startPosition, goalPosition) => {
   return unknownGrid;
 };
 
+export const revealAroundAgent = (
+  realGrid,
+  agentGrid,
+  agentPosition,
+  radius = 1,
+) => {
+  for (let dy = -radius; dy <= radius; dy++) {
+    for (let dx = -radius; dx <= radius; dx++) {
+      const x = agentPosition.x + dx;
+      const y = agentPosition.y + dy;
+      const position = { x, y };
+
+      if (!inBounds(realGrid, position)) continue;
+
+      const realCell = getCell(realGrid, position);
+      setCell(agentGrid, position, realCell);
+    }
+  }
+};
+
 export const printGrid = (grid) => {
   console.log(grid.map((row) => row.join(" ")).join("\n"));
 };

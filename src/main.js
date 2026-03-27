@@ -7,6 +7,7 @@ import {
   createAgentGrid,
   createGrid,
   printGrid,
+  revealAroundAgent,
   setCell,
 } from "./grid.js";
 import {
@@ -15,7 +16,7 @@ import {
   getPathLength,
 } from "./metrics.js";
 import { animateExploration, drawGrid } from "./render.js";
-import { fromPositionToKey } from "./utils.js";
+import { fromKeyToPosition, fromPositionToKey } from "./utils.js";
 import "./style.css";
 
 // Canvas
@@ -54,8 +55,10 @@ if (savedGrid) {
 }
 
 const agentGrid = createAgentGrid(grid, startPosition, goalPosition);
+revealAroundAgent(grid, agentGrid, startPosition, 1);
 printGrid(grid);
 printGrid(agentGrid);
+let agentPosition = { ...startPosition };
 
 drawGrid(grid, ctx, cellSize);
 
@@ -66,6 +69,7 @@ algoTitle.innerText = {
   bfs: "Breadth First Search",
   dijkstra: "Dijkstra",
   a_star: "A*",
+  a_star_replanned: "A* Replannifié",
 }[algorithm];
 
 const algoSelect = document.getElementById("algoSelect");
@@ -80,7 +84,11 @@ algoSelect.addEventListener("change", (e) => {
   window.location.search = params.toString();
 });
 
-let result;
+let result = {
+  found: false,
+  explorationOrder: [],
+  path: [],
+};
 switch (algorithm) {
   case "bfs":
     result = bfs(grid, startKey, goalKey);
@@ -90,6 +98,22 @@ switch (algorithm) {
     break;
   case "a_star":
     result = a_star(grid, startKey, goalKey);
+    break;
+  case "a_star_replanned":
+    while (fromPositionToKey(agentPosition) !== goalKey) {
+      revealAroundAgent(grid, agentGrid, agentPosition, 1);
+      printGrid(agentGrid);
+      result = a_star(agentGrid, fromPositionToKey(agentPosition), goalKey);
+
+      if (!result.found || result.path.length === 0) {
+        console.log("Pas de chemin connu pour l'instant");
+        break;
+      }
+
+      const nextKey = result.path[0];
+      const nextPosition = fromKeyToPosition(nextKey);
+      agentPosition = nextPosition;
+    }
     break;
   default:
     result = bfs(grid, startKey, goalKey);
