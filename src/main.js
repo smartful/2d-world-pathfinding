@@ -100,19 +100,41 @@ switch (algorithm) {
     result = a_star(grid, startKey, goalKey);
     break;
   case "a_star_replanned":
+    const globalExplorationOrder = [];
+    const globalPath = [];
     while (fromPositionToKey(agentPosition) !== goalKey) {
       revealAroundAgent(grid, agentGrid, agentPosition, 1);
       printGrid(agentGrid);
-      result = a_star(agentGrid, fromPositionToKey(agentPosition), goalKey);
+      const localResult = a_star(
+        agentGrid,
+        fromPositionToKey(agentPosition),
+        goalKey,
+      );
 
-      if (!result.found || result.path.length === 0) {
+      globalExplorationOrder.push(...localResult.explorationOrder);
+
+      if (!localResult.found || localResult.path.length === 0) {
         console.log("Pas de chemin connu pour l'instant");
+        result = {
+          found: false,
+          explorationOrder: globalExplorationOrder,
+          path: globalPath,
+        };
         break;
       }
 
-      const nextKey = result.path[0];
+      const nextKey = localResult.path[0];
+      globalPath.push(nextKey);
       const nextPosition = fromKeyToPosition(nextKey);
       agentPosition = nextPosition;
+
+      if (fromPositionToKey(agentPosition) === goalKey) {
+        result = {
+          found: true,
+          explorationOrder: globalExplorationOrder,
+          path: globalPath,
+        };
+      }
     }
     break;
   default:
