@@ -58,7 +58,7 @@ printGrid(grid);
 printGrid(agentGrid);
 let agentPosition = { ...startPosition };
 
-drawGrid(grid, ctx, cellSize);
+drawGrid(agentGrid, ctx, cellSize, new Set(), new Set(), agentPosition);
 
 const params = new URLSearchParams(window.location.search);
 const algorithm = params.get("algo") || "a_star_replanned";
@@ -140,7 +140,21 @@ if (!result.found) {
   document.getElementById("pathCost").innerText = pathCost.toFixed(2);
   document.getElementById("exploredNodes").innerText = exploredNodesCount;
 
-  animateExploration(grid, ctx, cellSize, result.explorationOrder, result.path);
+  // animateExploration(
+  //   agentGrid,
+  //   ctx,
+  //   cellSize,
+  //   result.explorationOrder,
+  //   result.path,
+  // );
+  drawGrid(
+    agentGrid,
+    ctx,
+    cellSize,
+    new Set(result.explorationOrder),
+    new Set(result.path),
+    agentPosition,
+  );
 }
 
 const regenBtn = document.getElementById("regenBtn");
