@@ -9,6 +9,26 @@ body {
   padding: 20px;
 }
 
+nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  gap: 2rem;
+}
+
+nav a {
+  color: white;
+}
+
+nav a:hover {
+  color: #aaa;
+}
+
+nav a.active {
+  color: #a2a3d4;
+  font-weight: bold;
+}
+
 canvas {
   border: 1px solid #444;
   background: #222;

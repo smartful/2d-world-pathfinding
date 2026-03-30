@@ -7,6 +7,7 @@ export const drawGrid = (
   cellSize,
   visitedCells = new Set(),
   pathCells = new Set(),
+  agentPosition = null,
 ) => {
   for (let y = 0; y < grid.length; y++) {
     for (let x = 0; x < grid[0].length; x++) {
@@ -14,8 +15,9 @@ export const drawGrid = (
       const key = fromPositionToKey(position);
       const cell = getCell(grid, position);
 
-      // 1) Base terrain
-      if (cell === "#") context.fillStyle = "#444";
+      // Base terrain
+      if (cell === "?") context.fillStyle = "#111";
+      else if (cell === "#") context.fillStyle = "#444";
       else if (cell === "S") context.fillStyle = "#3b82f6";
       else if (cell === "G") context.fillStyle = "#22c55e";
       else if (cell === "~") context.fillStyle = "#8f7450";
@@ -23,19 +25,33 @@ export const drawGrid = (
 
       context.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
 
-      // 2) Overlay visited
+      // Overlay visited
       if (visitedCells.has(key)) {
         context.fillStyle = "rgba(169, 85, 247, 0.45)";
         context.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
       }
 
-      // 3) Overlay path
+      // Overlay path
       if (pathCells.has(key)) {
         context.fillStyle = "rgba(250, 204, 21, 0.55)";
         context.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
       }
 
-      // 4) Grid border
+      // Agent
+      if (agentPosition && agentPosition.x === x && agentPosition.y === y) {
+        context.fillStyle = "#ef4444";
+        context.beginPath();
+        context.arc(
+          x * cellSize + cellSize / 2,
+          y * cellSize + cellSize / 2,
+          cellSize * 0.25,
+          0,
+          Math.PI * 2,
+        );
+        context.fill();
+      }
+
+      // Grid border
       context.strokeStyle = "#222";
       context.strokeRect(x * cellSize, y * cellSize, cellSize, cellSize);
     }

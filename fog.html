@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>2D World Pathfinding</title>
+    <title>2D World Pathfinding with fog</title>
   </head>
   <body>
     <h1>Simulateur de grille</h1>
@@ -15,9 +15,7 @@
 
     <h2>Algorithme : <span id="algoTitle"></span></h2>
     <select id="algoSelect">
-      <option value="bfs">BFS</option>
-      <option value="dijkstra">Dijkstra</option>
-      <option value="a_star">A*</option>
+      <option value="a_star_replanned">A* Replannifié</option>
     </select>
 
     <div id="stats">
@@ -31,6 +29,6 @@
     <button id="regenBtn">Régénérer la grille</button>
 
     <script type="module" src="/src/index.js"></script>
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/fog-main.js"></script>
   </body>
 </html>

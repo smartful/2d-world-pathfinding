@@ -1,11 +1,11 @@
-import { bfs } from "./algorithms/bfs.js";
-import { dijkstra } from "./algorithms/dijkstra.js";
 import { a_star } from "./algorithms/a_star.js";
 import {
   addRandomObstacles,
   addRandomWeightedCells,
+  createAgentGrid,
   createGrid,
   printGrid,
+  revealAroundAgent,
   setCell,
 } from "./grid.js";
 import {
@@ -52,16 +52,19 @@ if (savedGrid) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(grid));
 }
 
+const agentGrid = createAgentGrid(grid, startPosition, goalPosition);
+revealAroundAgent(grid, agentGrid, startPosition, 1);
 printGrid(grid);
+printGrid(agentGrid);
+let agentPosition = { ...startPosition };
+
 drawGrid(grid, ctx, cellSize);
 
 const params = new URLSearchParams(window.location.search);
-const algorithm = params.get("algo") || "bfs";
+const algorithm = params.get("algo") || "a_star_replanned";
 const algoTitle = document.getElementById("algoTitle");
 algoTitle.innerText = {
-  bfs: "Breadth First Search",
-  dijkstra: "Dijkstra",
-  a_star: "A*",
+  a_star_replanned: "A* Replannifié",
 }[algorithm];
 
 const algoSelect = document.getElementById("algoSelect");
@@ -82,17 +85,46 @@ let result = {
   path: [],
 };
 switch (algorithm) {
-  case "bfs":
-    result = bfs(grid, startKey, goalKey);
-    break;
-  case "dijkstra":
-    result = dijkstra(grid, startKey, goalKey);
-    break;
-  case "a_star":
-    result = a_star(grid, startKey, goalKey);
+  case "a_star_replanned":
+    const globalExplorationOrder = [];
+    const globalPath = [];
+    while (fromPositionToKey(agentPosition) !== goalKey) {
+      revealAroundAgent(grid, agentGrid, agentPosition, 1);
+      printGrid(agentGrid);
+      const localResult = a_star(
+        agentGrid,
+        fromPositionToKey(agentPosition),
+        goalKey,
+      );
+
+      globalExplorationOrder.push(...localResult.explorationOrder);
+
+      if (!localResult.found || localResult.path.length === 0) {
+        console.log("Pas de chemin connu pour l'instant");
+        result = {
+          found: false,
+          explorationOrder: globalExplorationOrder,
+          path: globalPath,
+        };
+        break;
+      }
+
+      const nextKey = localResult.path[0];
+      globalPath.push(nextKey);
+      const nextPosition = fromKeyToPosition(nextKey);
+      agentPosition = nextPosition;
+
+      if (fromPositionToKey(agentPosition) === goalKey) {
+        result = {
+          found: true,
+          explorationOrder: globalExplorationOrder,
+          path: globalPath,
+        };
+      }
+    }
     break;
   default:
-    result = bfs(grid, startKey, goalKey);
+    // result = bfs(grid, startKey, goalKey);
     break;
 }
 
