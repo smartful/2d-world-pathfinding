@@ -13,7 +13,7 @@ import {
   getPathCost,
   getPathLength,
 } from "./metrics.js";
-import { animateExploration, drawGrid } from "./render.js";
+import { animateFrames, createFrame, drawGrid } from "./render.js";
 import { fromKeyToPosition, fromPositionToKey } from "./utils.js";
 import "./style.css";
 
@@ -58,8 +58,7 @@ printGrid(grid);
 printGrid(agentGrid);
 let agentPosition = { ...startPosition };
 
-drawGrid(agentGrid, ctx, cellSize, new Set(), new Set(), agentPosition);
-
+// Manage algorithm choice
 const params = new URLSearchParams(window.location.search);
 const algorithm = params.get("algo") || "a_star_replanned";
 const algoTitle = document.getElementById("algoTitle");
@@ -79,6 +78,7 @@ algoSelect.addEventListener("change", (e) => {
   window.location.search = params.toString();
 });
 
+const frames = [];
 let result = {
   found: false,
   explorationOrder: [],
@@ -114,6 +114,14 @@ switch (algorithm) {
       const nextPosition = fromKeyToPosition(nextKey);
       agentPosition = nextPosition;
 
+      const frame = createFrame(
+        agentGrid,
+        globalExplorationOrder,
+        globalPath,
+        agentPosition,
+      );
+      frames.push(frame);
+
       if (fromPositionToKey(agentPosition) === goalKey) {
         result = {
           found: true,
@@ -124,7 +132,6 @@ switch (algorithm) {
     }
     break;
   default:
-    // result = bfs(grid, startKey, goalKey);
     break;
 }
 
@@ -140,21 +147,7 @@ if (!result.found) {
   document.getElementById("pathCost").innerText = pathCost.toFixed(2);
   document.getElementById("exploredNodes").innerText = exploredNodesCount;
 
-  // animateExploration(
-  //   agentGrid,
-  //   ctx,
-  //   cellSize,
-  //   result.explorationOrder,
-  //   result.path,
-  // );
-  drawGrid(
-    agentGrid,
-    ctx,
-    cellSize,
-    new Set(result.explorationOrder),
-    new Set(result.path),
-    agentPosition,
-  );
+  animateFrames(frames, ctx, cellSize);
 }
 
 const regenBtn = document.getElementById("regenBtn");

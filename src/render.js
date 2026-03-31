@@ -133,3 +133,36 @@ export const animatePath = (
     );
   }, 120);
 };
+
+const cloneGrid = (grid) => grid.map((row) => [...row]);
+
+export const createFrame = (
+  agentGrid,
+  explorationOrder,
+  path,
+  agentPosition,
+) => ({
+  grid: cloneGrid(agentGrid),
+  visited: new Set(explorationOrder),
+  path: new Set(path),
+  agentPosition: { ...agentPosition },
+});
+
+export const animateFrames = (frames, context, cellSize, index = 0) => {
+  if (index >= frames.length) return;
+
+  const frame = frames[index];
+
+  drawGrid(
+    frame.grid,
+    context,
+    cellSize,
+    frame.visited,
+    frame.path,
+    frame.agentPosition,
+  );
+
+  setTimeout(() => {
+    animateFrames(frames, context, cellSize, index + 1);
+  }, 500);
+};
